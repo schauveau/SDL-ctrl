@@ -916,6 +916,35 @@ SDL_SendKeyboardText(const char *text)
     return (posted);
 }
 
+/* SCHAUVEAU */
+int
+SDL_SendKeyboardTextCtrl(const char *text)
+{
+    SDL_Keyboard *keyboard = &SDL_keyboard;
+    int posted;
+
+    /* Don't post text events for unprintable characters */
+    if ((unsigned char)*text < ' ' || *text == 127) {
+        return 0;
+    }
+
+    /* Post the event, if desired */
+    /* TODO: should probably use SDL_GetEventState(SDL_TEXTINPUTCTRL) instead */ 
+    posted = 0;
+    if (SDL_GetEventState(SDL_TEXTINPUT) == SDL_ENABLE) {
+        SDL_Event event;
+        size_t i = 0, length = SDL_strlen(text);
+
+        event.text.type = SDL_TEXTINPUTCTRL;
+        event.text.windowID = keyboard->focus ? keyboard->focus->id : 0;
+        while (i < length) {
+            i += SDL_utf8strlcpy(event.text.text, text + i, SDL_arraysize(event.text.text));
+            posted |= (SDL_PushEvent(&event) > 0);
+        }
+    }
+    return (posted);
+}
+
 int
 SDL_SendEditingText(const char *text, int start, int length)
 {

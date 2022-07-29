@@ -103,7 +103,8 @@ typedef enum
                                      input language or keyboard layout change.
                                 */
     SDL_TEXTEDITING_EXT,       /**< Extended keyboard text editing (composition) */
-
+    SDL_TEXTINPUTCTRL,         /**< SCHAUVEAU: Keyboard text input with CTRL */
+    
     /* Mouse events */
     SDL_MOUSEMOTION    = 0x400, /**< Mouse moved */
     SDL_MOUSEBUTTONDOWN,        /**< Mouse button pressed */

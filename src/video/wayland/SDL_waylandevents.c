@@ -1014,6 +1014,8 @@ keyboard_handle_key(void *data, struct wl_keyboard *keyboard,
         }
     }
 
+    /* SCHAUVEAU */
+#if 0
     if (state == WL_KEYBOARD_KEY_STATE_PRESSED) {
         if (has_text && !(SDL_GetModState() & KMOD_CTRL)) {
             Wayland_data_device_set_serial(input->data_device, serial);
@@ -1025,6 +1027,23 @@ keyboard_handle_key(void *data, struct wl_keyboard *keyboard,
             keyboard_repeat_set(&input->keyboard_repeat, time, scancode, has_text, text);
         }
     }
+#else
+    if (state == WL_KEYBOARD_KEY_STATE_PRESSED) {
+        if (has_text) {
+            Wayland_data_device_set_serial(input->data_device, serial);
+            if (!handled_by_ime) {
+              if (SDL_GetModState() & KMOD_CTRL) {
+                SDL_SendKeyboardTextCtrl(text);
+              } else {
+                SDL_SendKeyboardText(text);
+              }
+            }
+        }
+        if (input->xkb.keymap && WAYLAND_xkb_keymap_key_repeats(input->xkb.keymap, key + 8)) {
+            keyboard_repeat_set(&input->keyboard_repeat, time, scancode, has_text, text);
+        }
+    }
+#endif
 }
 
 typedef struct Wayland_Keymap

@@ -1026,7 +1026,8 @@ X11_DispatchEvent(_THIS, XEvent *xevent)
             char text[SDL_TEXTINPUTEVENT_TEXT_SIZE];
             Status status = 0;
             SDL_bool handled_by_ime = SDL_FALSE;
-
+            bool ctrl_is_enabled = false;
+            
 #ifdef DEBUG_XEVENTS
             printf("window %p: %s (X11 keycode = 0x%X)\n", data, (xevent->type == KeyPress ? "KeyPress" : "KeyRelease"), xevent->xkey.keycode);
 #endif
@@ -1043,6 +1044,16 @@ X11_DispatchEvent(_THIS, XEvent *xevent)
 #endif
             /* */
             SDL_zeroa(text);
+#if 1
+            /* SCHAUVEAU:  
+             *    ctrl is handled by the X api so clear it temporarily during the lookup.
+             */
+            if (xevent->xkey.state & ControlMask ) {
+              xevent->xkey.state &= ~ControlMask ; // Clear ctrl  
+              ctrl_is_enabled = true; 
+            }
+#endif
+
 #ifdef X_HAVE_UTF8_STRING
             if (data->ic && xevent->type == KeyPress) {
                 X11_Xutf8LookupString(data->ic, &xevent->xkey, text, sizeof(text),
@@ -1053,7 +1064,13 @@ X11_DispatchEvent(_THIS, XEvent *xevent)
 #else
             X11_XLookupString(&xevent->xkey, text, sizeof(text), &keysym, NULL);
 #endif
-
+            /* SCHAUVEAU */
+            #if 1
+            if (ctrl_is_enabled) {
+              xevent->xkey.state |= ControlMask ; // restore ctrl  
+            }
+            #endif
+            
 #ifdef SDL_USE_IME
             if(SDL_GetEventState(SDL_TEXTINPUT) == SDL_ENABLE){
                 handled_by_ime = SDL_IME_ProcessKeyEvent(keysym, keycode, (xevent->type == KeyPress ? SDL_PRESSED : SDL_RELEASED));
@@ -1065,9 +1082,18 @@ X11_DispatchEvent(_THIS, XEvent *xevent)
                     if (xevent->xkey.keycode != videodata->filter_code || xevent->xkey.time != videodata->filter_time) {
                         SDL_SendKeyboardKey(SDL_PRESSED, videodata->key_layout[keycode]);
                     }
+#if 1
+                    // SCHAUVEAU
+                    if (ctrl_is_enabled) {
+                      SDL_SendKeyboardTextCtrl(text);
+                    } else {
+                      SDL_SendKeyboardText(text);
+                    }
+#else
                     if(*text) {
                         SDL_SendKeyboardText(text);
                     }
+#endif
                 } else {
                     if (X11_KeyRepeat(display, xevent)) {
                         /* We're about to get a repeated key down, ignore the key up */
