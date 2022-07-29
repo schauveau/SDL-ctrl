@@ -19,6 +19,9 @@ a non-breaking change since old applications can ignore new events.
 
 This fork implements a proof of concept for the `wayland` and `x11` backends.
 
+See also https://github.com/libsdl-org/SDL/issues/5977
+
+
 ## Quick Test without installing
 
 The program `test/checkkeys.c` was modified to show the new events. 
