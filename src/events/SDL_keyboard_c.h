@@ -62,7 +62,7 @@ extern SDL_bool SDL_HardwareKeyboardKeyPressed(void);
 /* Send keyboard text input */
 extern int SDL_SendKeyboardText(const char *text);
 
-/* Send keyboard text input when CTRL modifier */
+/* SCHAUVEAU: Send keyboard text input when CTRL modifier */
 extern int SDL_SendKeyboardTextCtrl(const char *text);
 
 /* Send editing text for selected range from start to end */

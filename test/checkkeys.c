@@ -191,6 +191,11 @@ loop()
             PrintText("INPUT", event.text.text);
             SDLTest_TextWindowAddText(textwin, "%s", event.text.text);
             break;
+        /* SCHAUVEAU */
+        case SDL_TEXTINPUTCTRL:
+            PrintText("INPUTCTRL", event.text.text);
+            SDLTest_TextWindowAddText(textwin, "%s", event.text.text);
+            break;
         case SDL_FINGERDOWN:
             if (SDL_IsTextInputActive()) {
                 SDL_Log("Stopping text input\n");
